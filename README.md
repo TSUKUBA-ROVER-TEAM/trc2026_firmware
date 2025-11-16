@@ -4,5 +4,5 @@
 ### 開発環境
 - VSCode
 - Platform IO
-- Raspberry Pi Pico (RP2040)
+- Teensy4.1
 - Arduino Framework
