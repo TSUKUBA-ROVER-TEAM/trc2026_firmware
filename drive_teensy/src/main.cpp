@@ -77,7 +77,7 @@ void timer_callback(rcl_timer_t *timer, int64_t last_call_time) {
     if (now - last_time >= 10) {
 
       target_current[0] =
-          drive_left_forward.compute(target_velocity[0], bus.Get(0).Velocity(),
+          drive_left_forward.compute(target_velocity[0] * -1.0, bus.Get(0).Velocity(),
                                      (now - last_time) / 1000.0);
       target_current[1] =
           drive_right_forward.compute(target_velocity[1], bus.Get(1).Velocity(),
@@ -86,10 +86,10 @@ void timer_callback(rcl_timer_t *timer, int64_t last_call_time) {
           drive_left_backward.compute(target_velocity[2], bus.Get(2).Velocity(),
                                       (now - last_time) / 1000.0);
       target_current[3] = drive_right_backward.compute(
-          target_velocity[3], bus.Get(3).Velocity(),
+          target_velocity[3] * -1.0, bus.Get(3).Velocity(),
           (now - last_time) / 1000.0);
-          
-      bus.CommandTorques(target_current[0], target_current[1],
+
+      bus.CommandTorques(target_current[0], target_current[1] ,
                          target_current[2], target_current[3],
                          C610Subbus::kOneToFourBlinks);
 
@@ -102,13 +102,13 @@ void timer_callback(rcl_timer_t *timer, int64_t last_call_time) {
           rcl_publish(&drive_feedback_publisher, &drive_feedback_msg, NULL));
 
       steer_left_forward.write(
-          static_cast<int>(90 + (steer_angle[0] / PI) * 180));
+          static_cast<int>(90 + (steer_angle[0] / PI) * 120 * -1.0));
       steer_right_forward.write(
-          static_cast<int>(90 + (steer_angle[1] / PI) * 180));
+          static_cast<int>(90 + (steer_angle[1] / PI) * 120));
       steer_left_backward.write(
-          static_cast<int>(90 + (steer_angle[2] / PI) * 180));
+          static_cast<int>(90 + (steer_angle[2] / PI) * 120));
       steer_right_backward.write(
-          static_cast<int>(90 + (steer_angle[3] / PI) * 180));
+          static_cast<int>(90 + (steer_angle[3] / PI) * 120 * -1.0));
 
       last_time = now;
     }
@@ -230,10 +230,10 @@ void setup() {
                                          &steer_command_msg,
                                          &steer_command_callback, ON_NEW_DATA));
 
-  steer_left_forward.attach(3);
-  steer_right_forward.attach(4);
-  steer_left_backward.attach(5);
-  steer_right_backward.attach(6);
+  steer_left_forward.attach(28);
+  steer_right_forward.attach(29);
+  steer_left_backward.attach(8);
+  steer_right_backward.attach(7);
 
   pinMode(13, OUTPUT);
   digitalWrite(13, HIGH);
